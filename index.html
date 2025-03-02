@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Japanese Learning App</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+    
+    .container {
+      background-color: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .settings {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .mode-toggle {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    
+    .toggle-btn {
+      padding: 10px 15px;
+      border: 1px solid #3498db;
+      background-color: white;
+      color: #3498db;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .toggle-btn.active {
+      background-color: #3498db;
+      color: white;
+    }
+    
+    .toggle-btn:first-child {
+      border-radius: 5px 0 0 5px;
+    }
+    
+    .toggle-btn:last-child {
+      border-radius: 0 5px 5px 0;
+    }
+    
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      margin-top: 20px;
+    }
+    
+    .character {
+      font-size: 80px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2980b9;
+    }
+    
+    .answer {
+      font-size: 70px;
+      margin: 20px 0;
+      height: 80px;
+      text-align: center;
+      color: #e74c3c;
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    button:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
+    }
+    
+    .start-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 30px;
+      font-size: 18px;
+      background-color: #2ecc71;
+    }
+    
+    .start-btn:hover {
+      background-color: #27ae60;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Japanese Learning App</h1>
+    
+    <div class="settings">
+      <div>
+        <h3>Select Character Sets:</h3>
+        <div class="checkboxes">
+          <div class="checkbox-item">
+            <input type="checkbox" id="hiragana" checked>
+            <label for="hiragana">Hiragana</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="katakana">
+            <label for="katakana">Katakana</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="kanjiN5">
+            <label for="kanjiN5">Kanji N5</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="kanjiN4">
+            <label for="kanjiN4">Kanji N4</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="kanjiN3">
+            <label for="kanjiN3">Kanji N3</label>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <h3>Study Mode:</h3>
+        <div class="mode-toggle">
+          <button class="toggle-btn active" id="english-to-japanese">English → Japanese</button>
+          <button class="toggle-btn" id="japanese-to-english">Japanese → English</button>
+        </div>
+      </div>
+      
+      <button class="start-btn" id="start-btn">Start Practice</button>
+    </div>
+    
+    <div class="card">
+      <div class="character" id="character"></div>
+      <div class="answer" id="answer"></div>
+      <div class="buttons">
+        <button id="reveal-btn" disabled>Reveal Answer</button>
+        <button id="next-btn" disabled>Next Character</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Character data
+    const characterSets = {
+      hiragana: [
+        { japanese: 'あ', english: 'a' }, { japanese: 'い', english: 'i' }, { japanese: 'う', english: 'u' },
+        { japanese: 'え', english: 'e' }, { japanese: 'お', english: 'o' }, { japanese: 'か', english: 'ka' },
+        { japanese: 'き', english: 'ki' }, { japanese: 'く', english: 'ku' }, { japanese: 'け', english: 'ke' },
+        { japanese: 'こ', english: 'ko' }, { japanese: 'さ', english: 'sa' }, { japanese: 'し', english: 'shi' },
+        { japanese: 'す', english: 'su' }, { japanese: 'せ', english: 'se' }, { japanese: 'そ', english: 'so' },
+        { japanese: 'た', english: 'ta' }, { japanese: 'ち', english: 'chi' }, { japanese: 'つ', english: 'tsu' },
+        { japanese: 'て', english: 'te' }, { japanese: 'と', english: 'to' }, { japanese: 'な', english: 'na' },
+        { japanese: 'に', english: 'ni' }, { japanese: 'ぬ', english: 'nu' }, { japanese: 'ね', english: 'ne' },
+        { japanese: 'の', english: 'no' }, { japanese: 'は', english: 'ha' }, { japanese: 'ひ', english: 'hi' },
+        { japanese: 'ふ', english: 'fu' }, { japanese: 'へ', english: 'he' }, { japanese: 'ほ', english: 'ho' },
+        { japanese: 'ま', english: 'ma' }, { japanese: 'み', english: 'mi' }, { japanese: 'む', english: 'mu' },
+        { japanese: 'め', english: 'me' }, { japanese: 'も', english: 'mo' }, { japanese: 'や', english: 'ya' },
+        { japanese: 'ゆ', english: 'yu' }, { japanese: 'よ', english: 'yo' }, { japanese: 'ら', english: 'ra' },
+        { japanese: 'り', english: 'ri' }, { japanese: 'る', english: 'ru' }, { japanese: 'れ', english: 're' },
+        { japanese: 'ろ', english: 'ro' }, { japanese: 'わ', english: 'wa' }, { japanese: 'を', english: 'wo' },
+        { japanese: 'ん', english: 'n' },
+        // Dakuten and handakuten
+        { japanese: 'が', english: 'ga' }, { japanese: 'ぎ', english: 'gi' }, { japanese: 'ぐ', english: 'gu' },
+        { japanese: 'げ', english: 'ge' }, { japanese: 'ご', english: 'go' }, { japanese: 'ざ', english: 'za' },
+        { japanese: 'じ', english: 'ji' }, { japanese: 'ず', english: 'zu' }, { japanese: 'ぜ', english: 'ze' },
+        { japanese: 'ぞ', english: 'zo' }, { japanese: 'だ', english: 'da' }, { japanese: 'ぢ', english: 'ji' },
+        { japanese: 'づ', english: 'zu' }, { japanese: 'で', english: 'de' }, { japanese: 'ど', english: 'do' },
+        { japanese: 'ば', english: 'ba' }, { japanese: 'び', english: 'bi' }, { japanese: 'ぶ', english: 'bu' },
+        { japanese: 'べ', english: 'be' }, { japanese: 'ぼ', english: 'bo' }, { japanese: 'ぱ', english: 'pa' },
+        { japanese: 'ぴ', english: 'pi' }, { japanese: 'ぷ', english: 'pu' }, { japanese: 'ぺ', english: 'pe' },
+        { japanese: 'ぽ', english: 'po' },
+        // Compound characters
+        { japanese: 'きゃ', english: 'kya' }, { japanese: 'きゅ', english: 'kyu' }, { japanese: 'きょ', english: 'kyo' },
+        { japanese: 'しゃ', english: 'sha' }, { japanese: 'しゅ', english: 'shu' }, { japanese: 'しょ', english: 'sho' },
+        { japanese: 'ちゃ', english: 'cha' }, { japanese: 'ちゅ', english: 'chu' }, { japanese: 'ちょ', english: 'cho' },
+        { japanese: 'にゃ', english: 'nya' }, { japanese: 'にゅ', english: 'nyu' }, { japanese: 'にょ', english: 'nyo' },
+        { japanese: 'ひゃ', english: 'hya' }, { japanese: 'ひゅ', english: 'hyu' }, { japanese: 'ひょ', english: 'hyo' },
+        { japanese: 'みゃ', english: 'mya' }, { japanese: 'みゅ', english: 'myu' }, { japanese: 'みょ', english: 'myo' },
+        { japanese: 'りゃ', english: 'rya' }, { japanese: 'りゅ', english: 'ryu' }, { japanese: 'りょ', english: 'ryo' },
+        { japanese: 'ぎゃ', english: 'gya' }, { japanese: 'ぎゅ', english: 'gyu' }, { japanese: 'ぎょ', english: 'gyo' },
+        { japanese: 'じゃ', english: 'ja' }, { japanese: 'じゅ', english: 'ju' }, { japanese: 'じょ', english: 'jo' },
+        { japanese: 'びゃ', english: 'bya' }, { japanese: 'びゅ', english: 'byu' }, { japanese: 'びょ', english: 'byo' },
+        { japanese: 'ぴゃ', english: 'pya' }, { japanese: 'ぴゅ', english: 'pyu' }, { japanese: 'ぴょ', english: 'pyo' }
+      ],
+      katakana: [
+        { japanese: 'ア', english: 'a' }, { japanese: 'イ', english: 'i' }, { japanese: 'ウ', english: 'u' },
+        { japanese: 'エ', english: 'e' }, { japanese: 'オ', english: 'o' }, { japanese: 'カ', english: 'ka' },
+        { japanese: 'キ', english: 'ki' }, { japanese: 'ク', english: 'ku' }, { japanese: 'ケ', english: 'ke' },
+        { japanese: 'コ', english: 'ko' }, { japanese: 'サ', english: 'sa' }, { japanese: 'シ', english: 'shi' },
+        { japanese: 'ス', english: 'su' }, { japanese: 'セ', english: 'se' }, { japanese: 'ソ', english: 'so' },
+        { japanese: 'タ', english: 'ta' }, { japanese: 'チ', english: 'chi' }, { japanese: 'ツ', english: 'tsu' },
+        { japanese: 'テ', english: 'te' }, { japanese: 'ト', english: 'to' }, { japanese: 'ナ', english: 'na' },
+        { japanese: 'ニ', english: 'ni' }, { japanese: 'ヌ', english: 'nu' }, { japanese: 'ネ', english: 'ne' },
+        { japanese: 'ノ', english: 'no' }, { japanese: 'ハ', english: 'ha' }, { japanese: 'ヒ', english: 'hi' },
+        { japanese: 'フ', english: 'fu' }, { japanese: 'ヘ', english: 'he' }, { japanese: 'ホ', english: 'ho' },
+        { japanese: 'マ', english: 'ma' }, { japanese: 'ミ', english: 'mi' }, { japanese: 'ム', english: 'mu' },
+        { japanese: 'メ', english: 'me' }, { japanese: 'モ', english: 'mo' }, { japanese: 'ヤ', english: 'ya' },
+        { japanese: 'ユ', english: 'yu' }, { japanese: 'ヨ', english: 'yo' }, { japanese: 'ラ', english: 'ra' },
+        { japanese: 'リ', english: 'ri' }, { japanese: 'ル', english: 'ru' }, { japanese: 'レ', english: 're' },
+        { japanese: 'ロ', english: 'ro' }, { japanese: 'ワ', english: 'wa' }, { japanese: 'ヲ', english: 'wo' },
+        { japanese: 'ン', english: 'n' },
+        // Dakuten and handakuten
+        { japanese: 'ガ', english: 'ga' }, { japanese: 'ギ', english: 'gi' }, { japanese: 'グ', english: 'gu' },
+        { japanese: 'ゲ', english: 'ge' }, { japanese: 'ゴ', english: 'go' }, { japanese: 'ザ', english: 'za' },
+        { japanese: 'ジ', english: 'ji' }, { japanese: 'ズ', english: 'zu' }, { japanese: 'ゼ', english: 'ze' },
+        { japanese: 'ゾ', english: 'zo' }, { japanese: 'ダ', english: 'da' }, { japanese: 'ヂ', english: 'ji' },
+        { japanese: 'ヅ', english: 'zu' }, { japanese: 'デ', english: 'de' }, { japanese: 'ド', english: 'do' },
+        { japanese: 'バ', english: 'ba' }, { japanese: 'ビ', english: 'bi' }, { japanese: 'ブ', english: 'bu' },
+        { japanese: 'ベ', english: 'be' }, { japanese: 'ボ', english: 'bo' }, { japanese: 'パ', english: 'pa' },
+        { japanese: 'ピ', english: 'pi' }, { japanese: 'プ', english: 'pu' }, { japanese: 'ペ', english: 'pe' },
+        { japanese: 'ポ', english: 'po' },
+        // Compound characters
+        { japanese: 'キャ', english: 'kya' }, { japanese: 'キュ', english: 'kyu' }, { japanese: 'キョ', english: 'kyo' },
+        { japanese: 'シャ', english: 'sha' }, { japanese: 'シュ', english: 'shu' }, { japanese: 'ショ', english: 'sho' },
+        { japanese: 'チャ', english: 'cha' }, { japanese: 'チュ', english: 'chu' }, { japanese: 'チョ', english: 'cho' },
+        { japanese: 'ニャ', english: 'nya' }, { japanese: 'ニュ', english: 'nyu' }, { japanese: 'ニョ', english: 'nyo' },
+        { japanese: 'ヒャ', english: 'hya' }, { japanese: 'ヒュ', english: 'hyu' }, { japanese: 'ヒョ', english: 'hyo' },
+        { japanese: 'ミャ', english: 'mya' }, { japanese: 'ミュ', english: 'myu' }, { japanese: 'ミョ', english: 'myo' },
+        { japanese: 'リャ', english: 'rya' }, { japanese: 'リュ', english: 'ryu' }, { japanese: 'リョ', english: 'ryo' },
+        { japanese: 'ギャ', english: 'gya' }, { japanese: 'ギュ', english: 'gyu' }, { japanese: 'ギョ', english: 'gyo' },
+        { japanese: 'ジャ', english: 'ja' }, { japanese: 'ジュ', english: 'ju' }, { japanese: 'ジョ', english: 'jo' },
+        { japanese: 'ビャ', english: 'bya' }, { japanese: 'ビュ', english: 'byu' }, { japanese: 'ビョ', english: 'byo' },
+        { japanese: 'ピャ', english: 'pya' }, { japanese: 'ピュ', english: 'pyu' }, { japanese: 'ピョ', english: 'pyo' }
+      ],
+      kanjiN5: [
+        { japanese: '一', english: 'one' }, { japanese: '二', english: 'two' }, { japanese: '三', english: 'three' },
+        { japanese: '四', english: 'four' }, { japanese: '五', english: 'five' }, { japanese: '六', english: 'six' },
+        { japanese: '七', english: 'seven' }, { japanese: '八', english: 'eight' }, { japanese: '九', english: 'nine' },
+        { japanese: '十', english: 'ten' }, { japanese: '百', english: 'hundred' }, { japanese: '千', english: 'thousand' },
+        { japanese: '万', english: 'ten thousand' }, { japanese: '日', english: 'day, sun' }, { japanese: '月', english: 'month, moon' },
+        { japanese: '火', english: 'fire' }, { japanese: '水', english: 'water' }, { japanese: '木', english: 'tree, wood' },
+        { japanese: '金', english: 'gold, money' }, { japanese: '土', english: 'soil, earth' }, { japanese: '人', english: 'person' },
+        { japanese: '大', english: 'big' }, { japanese: '小', english: 'small' }, { japanese: '中', english: 'middle' },
+        { japanese: '山', english: 'mountain' }, { japanese: '川', english: 'river' }, { japanese: '田', english: 'rice field' }
+      ],
+      kanjiN4: [
+        { japanese: '気', english: 'spirit, mind' }, { japanese: '生', english: 'life, birth' }, { japanese: '先', english: 'previous, ahead' },
+        { japanese: '私', english: 'I, private' }, { japanese: '今', english: 'now' }, { japanese: '食', english: 'eat, food' },
+        { japanese: '見', english: 'see' }, { japanese: '聞', english: 'hear, ask' }, { japanese: '行', english: 'go' },
+        { japanese: '来', english: 'come' }, { japanese: '書', english: 'write' }, { japanese: '読', english: 'read' },
+        { japanese: '話', english: 'talk, story' }, { japanese: '出', english: 'exit, leave' }, { japanese: '入', english: 'enter' },
+        { japanese: '高', english: 'high, expensive' }, { japanese: '安', english: 'cheap, safe' }, { japanese: '新', english: 'new' },
+        { japanese: '古', english: 'old (thing)' }, { japanese: '多', english: 'many' }, { japanese: '少', english: 'few' },
+        { japanese: '早', english: 'early, fast' }, { japanese: '長', english: 'long' }, { japanese: '子', english: 'child' },
+        { japanese: '学', english: 'study, learning' }, { japanese: '校', english: 'school' }, { japanese: '友', english: 'friend' }
+      ],
+      kanjiN3: [
+        { japanese: '決', english: 'decide' }, { japanese: '和', english: 'harmony' }, { japanese: '病', english: 'illness' },
+        { japanese: '院', english: 'institution' }, { japanese: '映', english: 'reflect, project' }, { japanese: '画', english: 'picture' },
+        { japanese: '歌', english: 'song' }, { japanese: '建', english: 'build' }, { japanese: '物', english: 'thing, object' },
+        { japanese: '政', english: 'politics, government' }, { japanese: '治', english: 'govern, cure' }, { japanese: '経', english: 'pass through' },
+        { japanese: '済', english: 'economy' }, { japanese: '産', english: 'produce, give birth' }, { japanese: '業', english: 'business, industry' },
+        { japanese: '音', english: 'sound' }, { japanese: '楽', english: 'comfort, music' }, { japanese: '歩', english: 'walk' },
+        { japanese: '通', english: 'pass through' }, { japanese: '由', english: 'reason' }, { japanese: '旅', english: 'travel' },
+        { japanese: '場', english: 'place' }, { japanese: '所', english: 'place' }, { japanese: '運', english: 'carry, luck' },
+        { japanese: '動', english: 'move' }, { japanese: '開', english: 'open' }, { japanese: '閉', english: 'close' }
+      ]
+    };
+
+    // DOM elements
+    const characterElement = document.getElementById('character');
+    const answerElement = document.getElementById('answer');
+    const revealBtn = document.getElementById('reveal-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const startBtn = document.getElementById('start-btn');
+    const englishToJapaneseBtn = document.getElementById('english-to-japanese');
+    const japaneseToEnglishBtn = document.getElementById('japanese-to-english');
+    
+    // State variables
+    let currentCharacters = [];
+    let currentIndex = 0;
+    let isEnglishToJapanese = true;
+    let isAnswerRevealed = false;
+    
+    // Event listeners for mode toggle
+    englishToJapaneseBtn.addEventListener('click', () => {
+      isEnglishToJapanese = true;
+      englishToJapaneseBtn.classList.add('active');
+      japaneseToEnglishBtn.classList.remove('active');
+    });
+    
+    japaneseToEnglishBtn.addEventListener('click', () => {
+      isEnglishToJapanese = false;
+      japaneseToEnglishBtn.classList.add('active');
+      englishToJapaneseBtn.classList.remove('active');
+    });
+    
+    // Start practice
+    startBtn.addEventListener('click', () => {
+      const hiraganaChecked = document.getElementById('hiragana').checked;
+      const katakanaChecked = document.getElementById('katakana').checked;
+      const kanjiN5Checked = document.getElementById('kanjiN5').checked;
+      const kanjiN4Checked = document.getElementById('kanjiN4').checked;
+      const kanjiN3Checked = document.getElementById('kanjiN3').checked;
+      
+      // Compile selected character sets
+      currentCharacters = [];
+      if (hiraganaChecked) currentCharacters = currentCharacters.concat(characterSets.hiragana);
+      if (katakanaChecked) currentCharacters = currentCharacters.concat(characterSets.katakana);
+      if (kanjiN5Checked) currentCharacters = currentCharacters.concat(characterSets.kanjiN5);
+      if (kanjiN4Checked) currentCharacters = currentCharacters.concat(characterSets.kanjiN4);
+      if (kanjiN3Checked) currentCharacters = currentCharacters.concat(characterSets.kanjiN3);
+      
+      if (currentCharacters.length === 0) {
+        alert('Please select at least one character set.');
+        return;
+      }
+      
+      // Shuffle characters
+      shuffleArray(currentCharacters);
+      
+      // Start practice
+      currentIndex = 0;
+      showCurrentCharacter();
+      revealBtn.disabled = false;
+      nextBtn.disabled = true;
+    });
+    
+    // Reveal answer
+    revealBtn.addEventListener('click', () => {
+      const currentChar = currentCharacters[currentIndex];
+      if (isEnglishToJapanese) {
+        answerElement.textContent = currentChar.japanese;
+      } else {
+        answerElement.textContent = currentChar.english;
+      }
+      isAnswerRevealed = true;
+      revealBtn.disabled = true;
+      nextBtn.disabled = false;
+    });
+    
+    // Next character
+    nextBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % currentCharacters.length;
+      showCurrentCharacter();
+      revealBtn.disabled = false;
+      nextBtn.disabled = true;
+      isAnswerRevealed = false;
+    });
+    
+    // Show current character
+    function showCurrentCharacter() {
+      const currentChar = currentCharacters[currentIndex];
+      if (isEnglishToJapanese) {
+        characterElement.textContent = currentChar.english;
+      } else {
+        characterElement.textContent = currentChar.japanese;
+      }
+      answerElement.textContent = '';
+    }
+    
+    // Shuffle array (Fisher-Yates algorithm)
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+  </script>
+</body>
+</html>
